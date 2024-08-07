@@ -1,26 +1,32 @@
+import lightning as L
+import torch
 from lightning.pytorch.loggers import WandbLogger
+import wandb
 
 import params
-import torch
+from callbacks.callback_utils import early_stopping, model_checkpoint
+from lightning_module.eeg_data_module import EEGDataModule
+from lightning_module.eeg_module import EEGModule
+
 
 def train():
     torch.set_float32_matmul_precision('medium')
 
     # # CLI parsing arguments
     # args = parse_arguments()
-    logger = False
-    if params.USE_LOGGER:
+    if params.ENABLE_LOGGING:
         logger = WandbLogger(save_dir=params.LOG_DIR, project='EEGPhasePredictor')
         # ======================
         # set logger name
         # ======================
 
         logger.experiment.config['batch_size'] = params.BATCH_SIZE
+    else:
+        logger = False
 
-    # resume_ckpt = f'{params.MODEL_TYPE}-{params.DATA_TYPE}-{params.CONF_TYPE}-{int(params.USE_ORGANISM)}_epochs={params.EPOCHS}.ckpt'
-    # checkpoint = ut.abspath(f'checkpoints/{resume_ckpt}')
-    # if not os.path.exists(checkpoint):
-    #     checkpoint = None
+    # ===================
+    # resume_checkpoint
+    # ===================
 
     checkpoint = None
 
@@ -28,25 +34,13 @@ def train():
     if params.ENABLE_CHECKPOINTING:
         trainer_callbacks = [model_checkpoint, early_stopping]
 
-    sp_module = SPModule(
-        model_type=params.MODEL_TYPE,
-        data_type=params.DATA_TYPE,
-        conf_type=params.CONF_TYPE,
-        use_organism=params.USE_ORGANISM,
-        batch_size=params.BATCH_SIZE,
-        lr=params.LEARNING_RATE,
-    )
-
-    sp_data_module = SPDataModule(
-        data_type=params.DATA_TYPE,
-        batch_size=params.BATCH_SIZE,
-        num_workers=params.NUM_WORKERS,
-    )
+    eeg_module = EEGModule()
+    eeg_data_module = EEGDataModule()
 
     trainer = L.Trainer(
         devices=params.DEVICES,
         accelerator=params.ACCELERATOR,
-        max_epochs=params.EPOCHS,
+        max_epochs=params.NUM_EPOCHS,
         logger=logger,
         enable_checkpointing=params.ENABLE_CHECKPOINTING,
         val_check_interval=1.0,
@@ -54,7 +48,7 @@ def train():
         callbacks=trainer_callbacks,
     )
 
-    trainer.fit(sp_module, datamodule=sp_data_module, ckpt_path=checkpoint)
+    trainer.fit(eeg_module, datamodule=eeg_data_module, ckpt_path=checkpoint)
 
     if logger:  # turn off wandb quiet if logger is not False
         wandb.finish(quiet=True)

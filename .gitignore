@@ -1,6 +1,6 @@
 # checkpoints
-checkpoints/*
+src/eegpp/checkpoints/*
 
 # logging
-logging/*
+src/eegpp/logging/*
 

@@ -4,7 +4,7 @@ from lightning.pytorch.callbacks import ModelCheckpoint, EarlyStopping
 from lightning.pytorch.callbacks import RichProgressBar, TQDMProgressBar
 from lightning.pytorch.callbacks.progress.rich_progress import RichProgressBarTheme
 
-import utils as ut
+from src.eegpp import utils as ut
 
 
 class CustomTQDMProgressBar(TQDMProgressBar):

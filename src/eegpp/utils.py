@@ -1,11 +1,11 @@
 import os.path
 from pathlib import Path
 
-_ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+_SRC_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 def abspath(path: str):
-    return str(Path(_ROOT_DIR, path))
+    return str(Path(_SRC_DIR, path))
 
 
 def abspaths(paths: list[str]):

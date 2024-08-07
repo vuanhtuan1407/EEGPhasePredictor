@@ -4,7 +4,7 @@ from torch.optim import AdamW
 
 
 class EEGModule(LightningModule):
-    def __init__(self, hparams):
+    def __init__(self):
         super().__init__()
 
     def forward(self, x):

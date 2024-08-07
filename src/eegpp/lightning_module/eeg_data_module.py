@@ -2,7 +2,7 @@ from lightning import LightningDataModule
 
 
 class EEGDataModule(LightningDataModule):
-    def __init__(self, data_dir):
+    def __init__(self):
         super().__init__()
 
     def prepare_data(self):
