@@ -4,3 +4,8 @@ src/eegpp/checkpoints/*
 # logging
 src/eegpp/logging/*
 
+# dataset
+src/eegpp/data/*.txt
+src/eegpp/data/train
+src/eegpp/data/val
+src/eegpp/data/test

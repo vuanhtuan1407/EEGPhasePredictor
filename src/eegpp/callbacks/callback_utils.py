@@ -1,10 +1,12 @@
 import sys
+from pathlib import Path
 
 from lightning.pytorch.callbacks import ModelCheckpoint, EarlyStopping
 from lightning.pytorch.callbacks import RichProgressBar, TQDMProgressBar
 from lightning.pytorch.callbacks.progress.rich_progress import RichProgressBarTheme
 
-from src.eegpp import utils as ut
+# from src.eegpp import utils as ut
+from src.eegpp import EEGPP_DIR
 
 
 class CustomTQDMProgressBar(TQDMProgressBar):
@@ -46,7 +48,7 @@ rich_progress_bar = RichProgressBar(
 
 filename = ''
 model_checkpoint = ModelCheckpoint(
-    dirpath=ut.abspath('checkpoints'),
+    dirpath=str(Path(EEGPP_DIR, 'checkpoints', filename)),
     filename=filename,
     enable_version_counter=False,
     monitor='val_loss',
