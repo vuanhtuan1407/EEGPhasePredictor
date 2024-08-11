@@ -4,7 +4,7 @@ from pathlib import Path
 import torch
 from torch import nn
 
-# from src.eegpp import utils as ut
+from src.eegpp import utils as ut
 from src.eegpp.configs import CONFIG_DIR
 
 
@@ -58,11 +58,9 @@ class Conv1DLayer(nn.Module):
 
 
 class CNN1DModel(nn.Module):
-    def __init__(self, json_config_file='cnn1d_3c_config.json'):
+    def __init__(self, yml_config_file='cnn1d_3c_config.yml'):
         super().__init__()
-        json_config_path = str(Path(CONFIG_DIR, json_config_file))
-        with open(json_config_path, 'r') as f:
-            self.config = json.load(f)
+        self.config = ut.load_yaml(yml_config_file)
         conv_layer_config = self.config['conv_layers']
         self.conv1d = nn.ModuleList()
         conv_in_channels = self.config['inp_embedding_dim']

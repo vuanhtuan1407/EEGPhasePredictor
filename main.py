@@ -4,4 +4,6 @@ import os
 
 if __name__ == '__main__':
     # train()
-    os.makedirs('src/eegpp/checkpoints', exist_ok=True)
+    import yaml
+    config = yaml.safe_load(open('./src/eegpp/configs/cnn1d_3c_config.yml'))
+    print(config['conv_layers'])

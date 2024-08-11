@@ -44,10 +44,13 @@ class EEGModule(LightningModule):
             optimizer = SGD(self.model.parameters(), lr=self.hparams.lr)
         return optimizer
 
+    def compute_loss(self, pred, true, window_size=5):
+        return self.loss_fn(pred, true)
+
     def base_step(self, batch, batch_idx):
         x, y = batch
         pred = self.forward(x)
-        loss = self.loss_fn(pred, y)
+        loss = self.compute_loss(pred, y)
         return x, y, pred, loss
 
     def training_step(self, batch, batch_idx):

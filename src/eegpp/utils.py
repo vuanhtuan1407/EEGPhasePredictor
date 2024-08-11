@@ -1,5 +1,7 @@
 from datetime import datetime
 
+import yaml
+
 
 def convert_datetime2ms(datetime_str: str, offset=946659600000):
     FORMAT_IN_DATA_FILE = '%Y.%m.%d.  %H:%M:%S.%f'
@@ -22,6 +24,11 @@ def convert_datetime2ms(datetime_str: str, offset=946659600000):
 
 def convert_ms2datetime(ms, offset=946659600000):
     return str(datetime.fromtimestamp((ms + offset) / 1000))
+
+
+def load_yaml(yaml_file):
+    with open(yaml_file, 'r') as f:
+        return yaml.safe_load(f)
 
 
 if __name__ == '__main__':

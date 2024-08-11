@@ -1,0 +1,21 @@
+inp_embedding_dim: 1024
+num_classes: 6
+conv_layers:
+  - name: conv1
+    out_channels: 2
+    kernel_size: 3
+    stride: 4
+    padding: 0
+    pooling_kernel_size: 1
+    pooling_stride: 2
+    pooling_padding: 3
+    dropout: 0.1
+  - name: conv2
+    out_channels: 2
+    kernel_size: 3
+    stride: 4
+    padding: 0
+    pooling_kernel_size: 1
+    pooling_stride: 2
+    pooling_padding: 3
+    dropout: 0.1
