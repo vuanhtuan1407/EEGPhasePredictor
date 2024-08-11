@@ -9,3 +9,4 @@ src/eegpp/data/*.txt
 src/eegpp/data/train
 src/eegpp/data/val
 src/eegpp/data/test
+src/eegpp/data/dump
