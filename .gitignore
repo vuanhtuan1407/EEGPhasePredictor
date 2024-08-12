@@ -6,6 +6,7 @@ src/eegpp/logging/*
 
 # dataset
 src/eegpp/data/*.txt
+src/eegpp/data/*.zip
 src/eegpp/data/train
 src/eegpp/data/val
 src/eegpp/data/test

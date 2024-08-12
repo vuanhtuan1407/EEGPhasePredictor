@@ -3,8 +3,14 @@
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
       <excludeFolder url="file://$MODULE_DIR$/.idea/inspectionProfiles" />
+      <excludeFolder url="file://$MODULE_DIR$/src/eegpp/data/dump" />
     </content>
     <orderEntry type="jdk" jdkName="EEGp39" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+  <component name="PackageRequirementsSettings">
+    <option name="versionSpecifier" value="Strong equality (==x.y.z)" />
+    <option name="removeUnused" value="true" />
+    <option name="modifyBaseFiles" value="true" />
   </component>
 </module>
