@@ -1,10 +1,11 @@
 # import joblib
+import os.path
 
 import joblib
 from tqdm import tqdm
 
 from src.eegpp import utils as ut
-from src.eegpp.data import SEQ_FILES, LABEL_FILES, DUMP_FILES
+from src.eegpp.data import SEQ_FILES, LABEL_FILES, DUMP_DATA_FILES, DUMP_DATA_DIR
 
 LABEL_DICT = {0: "W", 1: "W*", 2: "NR", 3: "NR*", 4: "R", 5: "R*", -1: "others"}
 
@@ -47,7 +48,7 @@ def dump_seq_with_labels(seq_files=SEQ_FILES, lb_files=LABEL_FILES, step_ms=4000
                     "mot": tmp_mot,
                 }
                 phases.append(phase)
-            joblib.dump(phases, DUMP_FILES['train'][i])
+            joblib.dump(phases, DUMP_DATA_FILES['train'][i])
     except Exception as e:
         raise e
 
@@ -67,7 +68,7 @@ def dump_seq_with_no_labels(seq_files=SEQ_FILES, step_ms=4000):
                     "mot": tmp_mot,
                 }
                 phases.append(phase)
-            joblib.dump(phases, DUMP_FILES['infer'][i])
+            joblib.dump(phases, DUMP_DATA_FILES['infer'][i])
     except Exception as e:
         raise e
 
@@ -151,4 +152,5 @@ def split_dataset_into_dirs():
 
 
 if __name__ == '__main__':
+    os.makedirs(DUMP_DATA_DIR, exist_ok=True)
     dump_seq_with_labels()

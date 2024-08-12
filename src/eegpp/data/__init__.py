@@ -18,7 +18,7 @@ LABEL_FILES = [
     str(Path(DATA_DIR, "S1_EEG1_23 hr.txt")),
 ]
 
-DUMP_FILES = {
+DUMP_DATA_FILES = {
     "train": [
         str(Path(DUMP_DATA_DIR, "dump_eeg_1.pkl")),
         str(Path(DUMP_DATA_DIR, "dump_eeg_2.pkl")),
