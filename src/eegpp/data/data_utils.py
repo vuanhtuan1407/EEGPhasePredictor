@@ -35,20 +35,22 @@ def dump_seq_with_labels(seq_files=SEQ_FILES, lb_files=LABEL_FILES, step_ms=4000
         # =========================================
 
         # Assume that all_start_ms1 == all_start_ms2
+        print('Dump data files...')
         for i, start_ms in enumerate(all_start_ms):
             eeg, emg, mot, lbs = all_eeg[i], all_emg[i], all_mot[i], all_lbs[i]
             phases = []
             for tmp_start_ms, tmp_eeg, tmp_emg, tmp_mot, tmp_lb in zip(start_ms, eeg, emg, mot, lbs):
-                start_datetime = ut.convert_ms2datetime(tmp_start_ms)
+                tmp_start_datetime = ut.convert_ms2datetime(tmp_start_ms)
                 phase = {
-                    "start_ms": start_ms,
-                    "start_datetime": start_datetime,
+                    "start_ms": tmp_start_ms,
+                    "start_datetime": tmp_start_datetime,
                     "eeg": tmp_eeg,
                     "emg": tmp_emg,
                     "mot": tmp_mot,
                 }
                 phases.append(phase)
             joblib.dump(phases, DUMP_DATA_FILES['train'][i])
+            print(f'Dump data in file {DUMP_DATA_FILES["train"][i]}')
     except Exception as e:
         raise e
 
@@ -56,19 +58,21 @@ def dump_seq_with_labels(seq_files=SEQ_FILES, lb_files=LABEL_FILES, step_ms=4000
 def dump_seq_with_no_labels(seq_files=SEQ_FILES, step_ms=4000):
     try:
         all_start_ms, all_eeg, all_emg, all_mot = load_seq(seq_files, step_ms)
+        print('Dump data files...')
         for i, start_ms, eeg, emg, mot in enumerate(zip(all_start_ms, all_eeg, all_emg, all_mot)):
             phases = []
             for tmp_start_ms, tmp_eeg, tmp_emg, tmp_mot in zip(start_ms, eeg, emg, mot):
-                start_datetime = ut.convert_ms2datetime(tmp_start_ms)
+                tmp_start_datetime = ut.convert_ms2datetime(tmp_start_ms)
                 phase = {
-                    "start_ms": start_ms,
-                    "start_datetime": start_datetime,
+                    "start_ms": tmp_start_ms,
+                    "start_datetime": tmp_start_datetime,
                     "eeg": tmp_eeg,
                     "emg": tmp_emg,
                     "mot": tmp_mot,
                 }
                 phases.append(phase)
             joblib.dump(phases, DUMP_DATA_FILES['infer'][i])
+            print(f'Dump data in file {DUMP_DATA_FILES["infer"][i]}')
     except Exception as e:
         raise e
 
