@@ -77,7 +77,7 @@ def load_seq(data_files=SEQ_FILES, step_ms=4000):
     all_start_ms, all_eeg, all_emg, all_mot = [[], [], [], []]
     for data_file in data_files:
         start_ms, eeg, emg, mot = [[], [], [], []]
-        with open(data_file, 'r') as f:
+        with open(data_file, 'r', encoding='utf-8', errors='replace') as f:
             data = f.readlines()
             start_line = 0
             while not data[start_line].__contains__('Time') and start_line < len(data):
@@ -127,7 +127,7 @@ def load_lbs(data_files=LABEL_FILES):
     print("Processing labels...")
     all_start_ms, all_lbs = [[], []]
     for data_file in data_files:
-        with open(data_file, 'r') as f:
+        with open(data_file, 'r', errors='replace', encoding='utf-8') as f:
             data = f.readlines()
             start_line = 0
             while not data[start_line].__contains__('Time') and start_line < len(data):
