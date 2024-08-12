@@ -1,13 +1,14 @@
 # import joblib
-import os
 
 import joblib
 from tqdm import tqdm
 
 from src.eegpp import utils as ut
-from src.eegpp.data import SEQ_FILES, LABEL_FILES, DUMP_FILES, DUMP_DATA_DIR
+from src.eegpp.data import SEQ_FILES, LABEL_FILES, DUMP_FILES
 
 LABEL_DICT = {0: "W", 1: "W*", 2: "NR", 3: "NR*", 4: "R", 5: "R*", -1: "others"}
+
+PATH_SLASH = ut.get_path_slash()
 
 
 def get_lb_idx(lb_text):
@@ -83,7 +84,8 @@ def load_seq(data_files=SEQ_FILES, step_ms=4000):
                 start_line = start_line + 1
             tmp_ms = 0
             tmp_eeg, tmp_emg, tmp_mot = [[], [], []]
-            for line in tqdm(data[start_line + 1:], total=len(data[start_line + 1:]), desc=data_file.split('\\')[-1]):
+            for line in tqdm(data[start_line + 1:], total=len(data[start_line + 1:]),
+                             desc=data_file.split(PATH_SLASH)[-1]):
                 split_data = line.split('\t')
                 if len(split_data) == 2:  # Final line in raw_S1_EEG1_23 hr.txt
                     dt, eeg6 = split_data
@@ -132,7 +134,7 @@ def load_lbs(data_files=LABEL_FILES):
                 start_line = start_line + 1
             tmp_ms, tmp_lbs = [[], []]
             for line in tqdm(data[start_line + 1:-1], total=len(data[start_line + 1:-1]),
-                             desc=data_file.split('\\')[-1]):
+                             desc=data_file.split(PATH_SLASH)[-1]):
                 _, lb_text, dt = line.split('\t')[:3]
                 ms = ut.convert_datetime2ms(dt)
                 lb = get_lb_idx(lb_text)

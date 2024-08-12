@@ -1,3 +1,4 @@
+import platform
 from datetime import datetime
 
 import yaml
@@ -29,6 +30,18 @@ def convert_ms2datetime(ms, offset=946659600000):
 def load_yaml(yaml_file):
     with open(yaml_file, 'r') as f:
         return yaml.safe_load(f)
+
+
+def get_os():
+    return platform.system()
+
+
+def get_path_slash():
+    os_system = platform.system()
+    if os_system == 'Windows':
+        return '\\'
+    else:
+        return '/'
 
 
 if __name__ == '__main__':
