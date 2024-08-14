@@ -38,18 +38,21 @@ def dump_seq_with_labels(seq_files=SEQ_FILES, lb_files=LABEL_FILES, step_ms=4000
         print('Dump data files...')
         for i, start_ms in enumerate(all_start_ms):
             eeg, emg, mot, lbs = all_eeg[i], all_emg[i], all_mot[i], all_lbs[i]
-            phases = []
-            for tmp_start_ms, tmp_eeg, tmp_emg, tmp_mot, tmp_lb in zip(start_ms, eeg, emg, mot, lbs):
-                tmp_start_datetime = ut.convert_ms2datetime(tmp_start_ms)
-                phase = {
-                    "start_ms": tmp_start_ms,
-                    "start_datetime": tmp_start_datetime,
-                    "eeg": tmp_eeg,
-                    "emg": tmp_emg,
-                    "mot": tmp_mot,
-                }
-                phases.append(phase)
-            joblib.dump(phases, DUMP_DATA_FILES['train'][i])
+            start_datetime = [ut.convert_ms2datetime(ms) for ms in start_ms]
+            joblib.dump((start_datetime, eeg, emg, mot, lbs), DUMP_DATA_FILES['train'][i])
+
+            # phases = []
+            # for tmp_start_ms, tmp_eeg, tmp_emg, tmp_mot, tmp_lb in zip(start_ms, eeg, emg, mot, lbs):
+            #     tmp_start_datetime = ut.convert_ms2datetime(tmp_start_ms)
+            #     phase = {
+            #         "start_ms": tmp_start_ms,
+            #         "start_datetime": tmp_start_datetime,
+            #         "eeg": tmp_eeg,
+            #         "emg": tmp_emg,
+            #         "mot": tmp_mot,
+            #     }
+            #     phases.append(phase)
+            # joblib.dump(phases, DUMP_DATA_FILES['train'][i])
             print(f'Dump data in file {DUMP_DATA_FILES["train"][i]}')
     except Exception as e:
         raise e
@@ -60,18 +63,22 @@ def dump_seq_with_no_labels(seq_files=SEQ_FILES, step_ms=4000):
         all_start_ms, all_eeg, all_emg, all_mot = load_seq(seq_files, step_ms)
         print('Dump data files...')
         for i, start_ms, eeg, emg, mot in enumerate(zip(all_start_ms, all_eeg, all_emg, all_mot)):
-            phases = []
-            for tmp_start_ms, tmp_eeg, tmp_emg, tmp_mot in zip(start_ms, eeg, emg, mot):
-                tmp_start_datetime = ut.convert_ms2datetime(tmp_start_ms)
-                phase = {
-                    "start_ms": tmp_start_ms,
-                    "start_datetime": tmp_start_datetime,
-                    "eeg": tmp_eeg,
-                    "emg": tmp_emg,
-                    "mot": tmp_mot,
-                }
-                phases.append(phase)
-            joblib.dump(phases, DUMP_DATA_FILES['infer'][i])
+            eeg, emg, mot = all_eeg[i], all_emg[i], all_mot[i]
+            start_datetime = [ut.convert_ms2datetime(ms) for ms in start_ms]
+            joblib.dump((start_datetime, eeg, emg, mot), DUMP_DATA_FILES['infer'][i])
+
+            # phases = []
+            # for tmp_start_ms, tmp_eeg, tmp_emg, tmp_mot in zip(start_ms, eeg, emg, mot):
+            #     tmp_start_datetime = ut.convert_ms2datetime(tmp_start_ms)
+            #     phase = {
+            #         "start_ms": tmp_start_ms,
+            #         "start_datetime": tmp_start_datetime,
+            #         "eeg": tmp_eeg,
+            #         "emg": tmp_emg,
+            #         "mot": tmp_mot,
+            #     }
+            #     phases.append(phase)
+            # joblib.dump(phases, DUMP_DATA_FILES['infer'][i])
             print(f'Dump data in file {DUMP_DATA_FILES["infer"][i]}')
     except Exception as e:
         raise e

@@ -3,19 +3,23 @@ from datetime import datetime
 
 import yaml
 
+FORMAT1 = '%Y.%m.%d.  %H:%M:%S.%f'  # use in original seq files
+FORMAT2 = '%Y.%m.%d.  %H:%M:%S'  # use in original label files and use as default format
+
 
 def convert_datetime2ms(datetime_str: str, offset=946659600000):
-    FORMAT_IN_DATA_FILE = '%Y.%m.%d.  %H:%M:%S.%f'
-    FORMAT1_IN_LABEL_FILE = '%Y.%m.%d.  %H:%M:%S'
     if datetime_str.__contains__("/"):
-        FORMAT_IN_DATA_FILE = '%m/%d/%Y  %H:%M:%S.%f'
-        FORMAT1_IN_LABEL_FILE = '%m/%d/%Y  %H:%M:%S'
+        format_seq = '%m/%d/%Y  %H:%M:%S.%f'
+        format_lb = '%m/%d/%Y  %H:%M:%S'
+    else:
+        format_seq = FORMAT1
+        format_lb = FORMAT2
 
     try:
         if datetime_str[-5:].__contains__("."):
-            dt_obj = datetime.strptime(datetime_str, FORMAT_IN_DATA_FILE)
+            dt_obj = datetime.strptime(datetime_str, format_seq)
         else:
-            dt_obj = datetime.strptime(datetime_str, FORMAT1_IN_LABEL_FILE)
+            dt_obj = datetime.strptime(datetime_str, format_lb)
 
         ms = int(dt_obj.timestamp() * 1000) - offset
     except:
@@ -24,7 +28,8 @@ def convert_datetime2ms(datetime_str: str, offset=946659600000):
 
 
 def convert_ms2datetime(ms, offset=946659600000):
-    return str(datetime.fromtimestamp((ms + offset) / 1000))
+    dt = datetime.fromtimestamp((ms + offset) / 1000)
+    return str(datetime.strftime(dt, FORMAT2))
 
 
 def load_yaml(yaml_file):
