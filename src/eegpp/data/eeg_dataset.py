@@ -1,5 +1,4 @@
 import joblib
-import torch
 from torch.utils.data import Dataset
 
 
@@ -17,4 +16,7 @@ class EEGDataset(Dataset):
         return len(self.start_datetime)
 
     def __getitem__(self, idx):
-        pass
+        if len(self.lbs) != 0:
+            return self.eeg[idx] / self.mxs[0], self.emg[idx] / self.mxs[1], self.mot[idx] / self.mxs[2], self.lbs[idx]
+        else:
+            return self.eeg[idx] / self.mxs[0], self.emg[idx] / self.mxs[1], self.mot[idx] / self.mxs[2]
