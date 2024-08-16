@@ -63,10 +63,9 @@ def dump_seq_with_labels(seq_files=SEQ_FILES, lb_files=LABEL_FILES):
     try:
         all_start_ms, all_eeg, all_emg, all_mot, all_lbs, all_mxs = load_seq_with_labels(seq_files, lb_files)
         print('Dump data files...')
-        for i, start_ms, eeg, emg, mot, lbs in enumerate(zip(all_start_ms, all_eeg, all_emg, all_mot, all_lbs)):
-            eeg, emg, mot, lbs = all_eeg[i], all_emg[i], all_mot[i], all_lbs[i]
+        for i, (start_ms, eeg, emg, mot, lbs, mxs) in enumerate(zip(all_start_ms, all_eeg, all_emg, all_mot, all_lbs, all_mxs)):
             start_datetime = [ut.convert_ms2datetime(ms) for ms in start_ms]
-            joblib.dump((start_datetime, eeg, emg, mot, lbs), DUMP_DATA_FILES['train'][i])
+            joblib.dump((start_datetime, eeg, emg, mot, lbs, mxs), DUMP_DATA_FILES['train'][i])
             print(f'Dump data in file {DUMP_DATA_FILES["train"][i]}')
     except Exception as e:
         raise e
@@ -76,10 +75,9 @@ def dump_seq_with_no_labels(seq_files=SEQ_FILES, step_ms=4000):
     try:
         all_start_ms, all_eeg, all_emg, all_mot, all_mxs = load_seq_only(seq_files, step_ms)
         print('Dump data files...')
-        for i, start_ms, eeg, emg, mot in enumerate(zip(all_start_ms, all_eeg, all_emg, all_mot)):
-            eeg, emg, mot = all_eeg[i], all_emg[i], all_mot[i]
+        for i, (start_ms, eeg, emg, mot, mxs) in enumerate(zip(all_start_ms, all_eeg, all_emg, all_mot, all_mxs)):
             start_datetime = [ut.convert_ms2datetime(ms) for ms in start_ms]
-            joblib.dump((start_datetime, eeg, emg, mot), DUMP_DATA_FILES['infer'][i])
+            joblib.dump((start_datetime, eeg, emg, mot, mxs), DUMP_DATA_FILES['infer'][i])
 
             # phases = []
             # for tmp_start_ms, tmp_eeg, tmp_emg, tmp_mot in zip(start_ms, eeg, emg, mot):
@@ -99,7 +97,6 @@ def dump_seq_with_no_labels(seq_files=SEQ_FILES, step_ms=4000):
 
 
 def load_seq_with_labels(seq_files=SEQ_FILES, lb_files=LABEL_FILES):
-    print('Processing labels...')
     all_start_ms, all_lbs = load_lbs(lb_files)
     print('Processing sequences...')
     all_eeg, all_emg, all_mot, all_mxs = [[], [], [], []]
@@ -236,6 +233,6 @@ def split_dataset_into_dirs():
 
 if __name__ == '__main__':
     # os.makedirs(DUMP_DATA_DIR, exist_ok=True)
-    # dump_seq_with_labels()
+    dump_seq_with_labels()
     # load_seq_only(step_ms=4000)
-    load_seq_with_labels()
+    # load_seq_with_labels()
