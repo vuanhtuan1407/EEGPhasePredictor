@@ -1,4 +1,4 @@
-inp_embedding_dim: 1024
+inp_embedding_dim: 3
 turnoff: null
 conv_layers:
   - name: conv1
