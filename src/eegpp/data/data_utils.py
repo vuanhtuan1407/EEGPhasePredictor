@@ -105,12 +105,12 @@ def load_seq_with_labels(seq_files=SEQ_FILES, lb_files=LABEL_FILES):
         start_ms = all_start_ms[i]
         eeg, emg, mot = [[], [], []]
         mxs = [-INF_V, -INF_V, -INF_V]
+        tmp_idx = 0
         with open(seq_file, 'r', encoding='utf-8', errors='replace') as f:
             data = f.readlines()
             start_line = 0
             while not data[start_line].__contains__('Time') and start_line < len(data):
                 start_line = start_line + 1
-            tmp_idx = 0
             tmp_eeg, tmp_emg, tmp_mot = [[], [], []]
             for line in tqdm(data[start_line + 1:], total=len(data[start_line + 1:]),
                              desc=seq_file.split(PATH_SLASH)[-1]):
@@ -121,30 +121,31 @@ def load_seq_with_labels(seq_files=SEQ_FILES, lb_files=LABEL_FILES):
                     dt, values = info[0], (info[1], info[2], info[3])
 
                 for j, value in enumerate(values):
-                    if abs(float(value)) > mxs[j]:
+                    value = float(value)
+                    if abs(value) > mxs[j]:
                         mxs[j] = abs(float(value))
 
                 ms = ut.convert_datetime2ms(dt)
-                if 0 < tmp_idx < len(start_ms) - 1 and ms == start_ms[tmp_idx + 1]:
+                if tmp_idx < len(start_ms) - 1 and ms == start_ms[tmp_idx + 1]:
                     eeg.append(tmp_eeg)
                     emg.append(tmp_emg)
                     mot.append(tmp_mot)
                     tmp_idx += 1
                     tmp_eeg, tmp_emg, tmp_mot = [[], [], []]
 
-                tmp_eeg.append(values[0])
-                tmp_emg.append(values[1])
-                tmp_mot.append(values[2])
+                tmp_eeg.append(float(values[0]))
+                tmp_emg.append(float(values[1]))
+                tmp_mot.append(float(values[2]))
 
             eeg.append(tmp_eeg)
             emg.append(tmp_emg)
             mot.append(tmp_mot)
 
-            all_start_ms.append(start_ms[: tmp_idx + 1])
-            all_eeg.append(eeg)
-            all_emg.append(emg)
-            all_mot.append(mot)
-            all_mxs.append(mxs)
+        all_start_ms.append(start_ms[: tmp_idx + 1])
+        all_eeg.append(eeg)
+        all_emg.append(emg)
+        all_mot.append(mot)
+        all_mxs.append(mxs)
 
     return all_start_ms, all_eeg, all_emg, all_mot, all_lbs, all_mxs
 
@@ -157,12 +158,12 @@ def load_seq_only(data_files=SEQ_FILES, step_ms=None):
     for data_file in data_files:
         start_ms, eeg, emg, mot = [[], [], [], []]
         mxs = [-INF_V, -INF_V, -INF_V]
+        tmp_ms = 0
         with open(data_file, 'r', encoding='utf-8', errors='replace') as f:
             data = f.readlines()
             start_line = 0
             while not data[start_line].__contains__('Time') and start_line < len(data):
                 start_line = start_line + 1
-            tmp_ms = 0
             tmp_eeg, tmp_emg, tmp_mot = [[], [], []]
             for line in tqdm(data[start_line + 1:], total=len(data[start_line + 1:]),
                              desc=data_file.split(PATH_SLASH)[-1]):
@@ -173,6 +174,7 @@ def load_seq_only(data_files=SEQ_FILES, step_ms=None):
                     dt, values = info[0], (info[1], info[2], info[3])
 
                 for j, value in enumerate(values):
+                    value = float(value)
                     if abs(float(value)) > mxs[j]:
                         mxs[j] = abs(float(value))
 
@@ -187,20 +189,20 @@ def load_seq_only(data_files=SEQ_FILES, step_ms=None):
                     tmp_ms = ms
                     tmp_eeg, tmp_emg, tmp_mot = [[], [], []]
 
-                tmp_eeg.append(values[0])
-                tmp_emg.append(values[1])
-                tmp_mot.append(values[2])
+                tmp_eeg.append(float(values[0]))
+                tmp_emg.append(float(values[1]))
+                tmp_mot.append(float(values[2]))
 
             start_ms.append(tmp_ms)
             eeg.append(tmp_eeg)
             emg.append(tmp_emg)
             mot.append(tmp_mot)
 
-            all_start_ms.append(start_ms)
-            all_eeg.append(eeg)
-            all_emg.append(emg)
-            all_mot.append(mot)
-            all_mxs.append(mxs)
+        all_start_ms.append(start_ms)
+        all_eeg.append(eeg)
+        all_emg.append(emg)
+        all_mot.append(mot)
+        all_mxs.append(mxs)
 
     return all_start_ms, all_eeg, all_emg, all_mot, all_mxs
 
