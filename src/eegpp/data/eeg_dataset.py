@@ -6,7 +6,7 @@ from torch.utils.data import Dataset
 
 
 class EEGDataset(Dataset):
-    def __init__(self, dump_path: str, window_size=1, contain_side: Literal['left', 'right', 'both', 'none'] = 'both',
+    def __init__(self, dump_path: str, window_size=3, contain_side: Literal['left', 'right', 'both', 'none'] = 'both',
                  is_infer=False):
         """
         EEG Dataset
@@ -51,6 +51,7 @@ class EEGDataset(Dataset):
         return seqs, lbs
 
     def _getseq_idx(self, idx):
+        print(idx)
         if idx < 0 or idx >= self.__len__():
             seq = [0.0, 0.0, 0.0]
         else:
