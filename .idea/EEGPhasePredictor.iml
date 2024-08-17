@@ -4,6 +4,7 @@
     <content url="file://$MODULE_DIR$">
       <excludeFolder url="file://$MODULE_DIR$/.idea/inspectionProfiles" />
       <excludeFolder url="file://$MODULE_DIR$/src/eegpp/data/dump" />
+      <excludeFolder url="file://$MODULE_DIR$/src/eegpp/logging" />
     </content>
     <orderEntry type="jdk" jdkName="EEGp39" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
