@@ -1,11 +1,13 @@
-import json
 from pathlib import Path
 
 import torch
 from torch import nn
 
+from src.eegpp import params
 from src.eegpp import utils as ut
 from src.eegpp.configs import CONFIG_DIR
+from src.eegpp.data.data_utils import LABEL_DICT
+from src.eegpp.models import model_utils as mut
 
 
 class MNAPooling1D(nn.Module):
@@ -58,14 +60,14 @@ class Conv1DLayer(nn.Module):
 
 
 class CNN1DModel(nn.Module):
-    def __init__(self, yml_config_file='cnn1d_3c_config.yml'):
+    def __init__(self, yml_config_file='cnn1d_config.yml'):
         super().__init__()
-        self.config = ut.load_yaml(yml_config_file)
+        self.config = ut.load_config_yaml(yml_config_file)
         conv_layer_config = self.config['conv_layers']
         self.conv1d = nn.ModuleList()
         conv_in_channels = self.config['inp_embedding_dim']
         for i, layer_config in enumerate(conv_layer_config):
-            self.conv_layer = Conv1DLayer(
+            conv_layer = Conv1DLayer(
                 in_channels=conv_in_channels,
                 out_channels=layer_config['out_channels'],
                 kernel_size=layer_config['kernel_size'],
@@ -76,22 +78,28 @@ class CNN1DModel(nn.Module):
                 pooling_padding=layer_config['pooling_padding'],
                 dropout=layer_config['dropout']
             )
-            conv_in_channels = self.config['out_channels']
-            self.conv1d.append(self.conv_layer)
+            conv_in_channels = layer_config['out_channels']
+            self.conv1d.append(conv_layer)
 
-        ff_in_features = conv_in_channels
+        self.flatten = nn.Flatten()
+
+        ff_in_features = 1024
         self.ff1 = nn.Sequential(
             nn.Linear(in_features=ff_in_features, out_features=ff_in_features * 2),
             nn.ReLU(),
         )
         self.ff2 = nn.Sequential(
-            nn.Linear(in_features=ff_in_features * 2, out_features=self.config['num_classes']),
+            nn.Linear(in_features=ff_in_features * 2, out_features=len(LABEL_DICT) * params.W_OUT),
             nn.ReLU(),
         )
         self.softmax = nn.Softmax(dim=1)
 
     def forward(self, x):
+        # x = mut.preprocess_inp(x, self.config['inp_embedding_dim'], self.config['turnoff'])
         x = self.conv1d(x)
+        x = self.flatten(x)
         x = self.ff1(x)
         x = self.ff2(x)
-        return self.softmax(x)
+        x = x.reshape(-1, len(LABEL_DICT), params.W_OUT)
+        x = x.transpose(1, 2)
+        return self.softmax(x, dim=-1)

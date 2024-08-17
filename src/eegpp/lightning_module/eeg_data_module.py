@@ -1,6 +1,12 @@
-from lightning import LightningDataModule
-from torch.utils.data import DataLoader
+import os
+from typing import Union
 
+from lightning import LightningDataModule
+from torch.utils.data import DataLoader, ConcatDataset
+
+from src.eegpp.data import DUMP_DATA_FILES
+from src.eegpp.data.data_utils import dump_seq_with_labels
+from src.eegpp.data.data_utils import split_dataset
 from src.eegpp.data.eeg_dataset import EEGDataset
 
 
@@ -12,12 +18,12 @@ class EEGDataModule(LightningDataModule):
             self,
             batch_size=8,
             num_workers=1,
-            combine_all_datasets=False,
+            dataset_file_idx: Union[list[int], str] = 'all',
     ):
         super().__init__()
         self.num_workers = num_workers
         self.batch_size = batch_size
-        self.combine_all_datasets = combine_all_datasets
+        self.dataset_file_idx = dataset_file_idx
 
         self.test_dataset = None
         self.val_dataset = None
@@ -25,16 +31,42 @@ class EEGDataModule(LightningDataModule):
         self.predict_dataset = None
 
     def prepare_data(self):
-        pass
+        force_dump = False
+        for dump_file in DUMP_DATA_FILES['train']:
+            if not os.path.exists(dump_file):
+                print('Cannot find dump file {}. Set force re-dump dats'.format(dump_file))
+                force_dump = True
+                break
+
+        if force_dump:
+            dump_seq_with_labels()
 
     def setup(self, stage=None):
+        train_dts, val_dts, test_dts = [[], [], []]
+        if isinstance(self.dataset_file_idx, list):
+            for idx in self.dataset_file_idx:
+                dump_file = DUMP_DATA_FILES['train'][idx]
+                print("Loading dump file {}".format(dump_file))
+                i_dataset = EEGDataset(dump_file)
+                train_set, val_set, test_set = split_dataset(i_dataset)
+                train_dts.append(train_set)
+                val_dts.append(val_set)
+                test_dts.append(test_set)
+
+        else:
+            for dump_file in DUMP_DATA_FILES['train']:
+                print("Loading dump file {}".format(dump_file))
+                i_dataset = EEGDataset(dump_file)
+                train_set, val_set, test_set = split_dataset(i_dataset)
+                train_dts.append(train_set)
+                val_dts.append(val_set)
+                test_dts.append(test_set)
+
         if stage == 'fit' or stage is None:
-            self.train_dataset = EEGDataset()
-            self.val_dataset = EEGDataset()
-        elif stage == 'test':
-            self.test_dataset = EEGDataset()
-        elif stage == "predict":
-            self.predict_dataset = EEGDataset(is_infer=True)
+            self.train_dataset = ConcatDataset(train_dts)
+            self.val_dataset = ConcatDataset(val_dts)
+        elif stage == 'test' or stage == 'predict':
+            self.test_dataset = ConcatDataset(test_dts)
 
     def train_dataloader(self):
         return DataLoader(

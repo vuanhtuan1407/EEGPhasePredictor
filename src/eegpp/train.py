@@ -3,15 +3,14 @@ import torch
 import wandb
 from lightning.pytorch.loggers import WandbLogger
 
-from src.eegpp import params
-from src.eegpp.callbacks.callback_utils import early_stopping, model_checkpoint
 from lightning_module.eeg_data_module import EEGDataModule
 from lightning_module.eeg_module import EEGModule
+from src.eegpp import params
+from src.eegpp.callbacks.callback_utils import early_stopping, model_checkpoint
 
 
 def train(
         model_type=params.MODEL_TYPE,
-        data_type=params.DATA_TYPE,
         enable_logging=params.ENABLE_LOGGING,
         log_dir=params.LOG_DIR,
         enable_checkpointing=params.ENABLE_CHECKPOINTING,
@@ -20,6 +19,9 @@ def train(
         num_epochs=params.NUM_EPOCHS,
         resume_ckpt=params.RESUME_CKPT,
         batch_size=params.BATCH_SIZE,
+        num_workers=params.NUM_WORKERS,
+        dataset_file_idx=params.DATASET_FILE_IDX,
+        lr=params.LEARNING_RATE
 ):
     torch.set_float32_matmul_precision('medium')
 
@@ -52,9 +54,13 @@ def train(
 
     eeg_module = EEGModule(
         model_type=model_type,
-        data_type=data_type,
+        lr=lr
     )
-    eeg_data_module = EEGDataModule()
+    eeg_data_module = EEGDataModule(
+        batch_size=batch_size,
+        num_workers=num_workers,
+        dataset_file_idx=dataset_file_idx
+    )
 
     trainer = L.Trainer(
         devices=device,

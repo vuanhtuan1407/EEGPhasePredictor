@@ -1,6 +1,8 @@
 # import joblib
 
 import joblib
+import torch
+from torch.utils.data import random_split
 from tqdm import tqdm
 
 from src.eegpp import utils as ut
@@ -63,7 +65,8 @@ def dump_seq_with_labels(seq_files=SEQ_FILES, lb_files=LABEL_FILES):
     try:
         all_start_ms, all_eeg, all_emg, all_mot, all_lbs, all_mxs = load_seq_with_labels(seq_files, lb_files)
         print('Dump data files...')
-        for i, (start_ms, eeg, emg, mot, lbs, mxs) in enumerate(zip(all_start_ms, all_eeg, all_emg, all_mot, all_lbs, all_mxs)):
+        for i, (start_ms, eeg, emg, mot, lbs, mxs) in enumerate(
+                zip(all_start_ms, all_eeg, all_emg, all_mot, all_lbs, all_mxs)):
             start_datetime = [ut.convert_ms2datetime(ms) for ms in start_ms]
             joblib.dump((start_datetime, eeg, emg, mot, lbs, mxs), DUMP_DATA_FILES['train'][i])
             print(f'Dump data in file {DUMP_DATA_FILES["train"][i]}')
@@ -227,8 +230,14 @@ def load_lbs(data_files=LABEL_FILES):
     return all_start_ms, all_lbs
 
 
-def split_dataset_into_dirs():
-    pass
+def split_dataset(dataset, train_val_test_rate: list[int] = [0.7, 0.1, 0.2], generator=None):
+    if not generator:
+        generator = torch.Generator().manual_seed(0)
+    if sum(train_val_test_rate) != 1.0:
+        raise ValueError('train + val + test must be == 1')
+    else:
+        train_set, val_set, test_set = random_split(dataset, train_val_test_rate, generator=generator)
+        return train_set, val_set, test_set
 
 
 if __name__ == '__main__':

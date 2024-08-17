@@ -1,7 +1,10 @@
 import platform
 from datetime import datetime
+from pathlib import Path
 
 import yaml
+
+from src.eegpp.configs import CONFIG_DIR
 
 FORMAT1 = '%Y.%m.%d.  %H:%M:%S.%f'  # use in original seq files
 FORMAT2 = '%Y.%m.%d.  %H:%M:%S'  # use in original label files and use as default format
@@ -32,8 +35,9 @@ def convert_ms2datetime(ms, offset=946659600000):
     return str(datetime.strftime(dt, FORMAT2))
 
 
-def load_yaml(yaml_file):
-    with open(yaml_file, 'r') as f:
+def load_config_yaml(yaml_file):
+    yml_config_path = str(Path(CONFIG_DIR, yaml_file))
+    with open(yml_config_path, 'r') as f:
         return yaml.safe_load(f)
 
 
