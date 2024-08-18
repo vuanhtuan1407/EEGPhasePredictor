@@ -67,11 +67,8 @@ def dump_seq_with_labels(seq_files=SEQ_FILES, lb_files=LABEL_FILES):
         all_start_ms, all_eeg, all_emg, all_mot, all_lbs, all_mxs = load_seq_with_labels(seq_files, lb_files)
         for i, (start_ms, eeg, emg, mot, lbs, mxs) in enumerate(
                 zip(all_start_ms, all_eeg, all_emg, all_mot, all_lbs, all_mxs)):
-
             print(f'Dumping data in file {DUMP_DATA_FILES["train"][i]}')
             start_datetime = [ut.convert_ms2datetime(ms) for ms in start_ms]
-            print(np.array(start_datetime).shape, np.array(eeg).shape, np.array(emg).shape, np.array(mot).shape,
-                  np.array(lbs).shape, np.array(mxs).shape)
             joblib.dump((start_datetime, eeg, emg, mot, lbs, mxs), DUMP_DATA_FILES['train'][i])
     except Exception as e:
         raise e
@@ -84,19 +81,6 @@ def dump_seq_with_no_labels(seq_files=SEQ_FILES, step_ms=4000):
             print(f'Dumping data in file {DUMP_DATA_FILES["infer"][i]}')
             start_datetime = [ut.convert_ms2datetime(ms) for ms in start_ms]
             joblib.dump((start_datetime, eeg, emg, mot, mxs), DUMP_DATA_FILES['infer'][i])
-
-            # phases = []
-            # for tmp_start_ms, tmp_eeg, tmp_emg, tmp_mot in zip(start_ms, eeg, emg, mot):
-            #     tmp_start_datetime = ut.convert_ms2datetime(tmp_start_ms)
-            #     phase = {
-            #         "start_ms": tmp_start_ms,
-            #         "start_datetime": tmp_start_datetime,
-            #         "eeg": tmp_eeg,
-            #         "emg": tmp_emg,
-            #         "mot": tmp_mot,
-            #     }
-            #     phases.append(phase)
-            # joblib.dump(phases, DUMP_DATA_FILES['infer'][i])
     except Exception as e:
         raise e
 
@@ -146,12 +130,14 @@ def load_seq_with_labels(seq_files=SEQ_FILES, lb_files=LABEL_FILES):
             emg.append(tmp_emg)
             mot.append(tmp_mot)
 
-        all_start_ms.append(start_ms[: tmp_idx + 1])
+            # update if num lbs > num segments
+            all_start_ms[i] = start_ms[: tmp_idx + 1]
+            all_lbs[i] = lbs[: tmp_idx + 1]
+
         all_eeg.append(eeg)
         all_emg.append(emg)
         all_mot.append(mot)
         all_mxs.append(mxs)
-        all_lbs.append(lbs[: tmp_idx + 1])
 
     return all_start_ms, all_eeg, all_emg, all_mot, all_lbs, all_mxs
 

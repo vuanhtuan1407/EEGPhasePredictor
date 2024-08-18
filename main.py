@@ -17,8 +17,9 @@ if __name__ == '__main__':
     # for layer in config['conv_layers']:
     #     print(layer['out_channels'])
     import joblib
-    start_datetime, eeg, emg, mot, lbs, mxs = joblib.load('./src/eegpp/data/dump/dump_eeg_1.pkl')
-    print(np.array(start_datetime).shape, np.array(eeg).shape, np.array(emg).shape, np.array(mot).shape, np.array(lbs).shape, np.array(mxs).shape)
+    start_datetime, eeg, emg, mot, lbs, mxs = joblib.load('./src/eegpp/data/dump/dump_eeg_3.pkl')
+    print(len(start_datetime), len(eeg), len(emg), len(mot), len(lbs), len(mxs))
+    # print(np.array(start_datetime).shape, np.array(eeg).shape, np.array(emg).shape, np.array(mot).shape, np.array(lbs).shape, np.array(mxs).shape)
     # print(phases[0])
     # t = []
     # for i in range(3):
