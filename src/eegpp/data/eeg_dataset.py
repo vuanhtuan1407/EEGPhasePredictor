@@ -4,6 +4,8 @@ import joblib
 import torch
 from torch.utils.data import Dataset
 
+from src.eegpp import params
+
 
 class EEGDataset(Dataset):
     def __init__(self, dump_path: str, window_size=3, contain_side: Literal['left', 'right', 'both', 'none'] = 'both',
@@ -23,6 +25,7 @@ class EEGDataset(Dataset):
         else:
             self.start_datetime, self.eeg, self.emg, self.mot, self.mxs = joblib.load(dump_path)
             self.lbs = []
+        self.segment_length = params.MAX_SEQ_SIZE
 
     def __len__(self):
         return len(self.start_datetime)
@@ -51,12 +54,16 @@ class EEGDataset(Dataset):
         return seqs, lbs
 
     def _getseq_idx(self, idx):
-        print(idx)
         if idx < 0 or idx >= self.__len__():
-            seq = [0.0, 0.0, 0.0]
+            eeg = torch.zeros(self.segment_length, dtype=torch.float32)
+            emg = torch.zeros(self.segment_length, dtype=torch.float32)
+            mot = torch.zeros(self.segment_length, dtype=torch.float32)
         else:
-            seq = [self.eeg[idx] / self.mxs[0], self.emg[idx] / self.mxs[1], self.mot[idx] / self.mxs[2]]
-        return torch.tensor(seq, dtype=torch.float32)
+            eeg = torch.tensor(self.eeg[idx], dtype=torch.float32) / self.mxs[0]
+            emg = torch.tensor(self.emg[idx], dtype=torch.float32) / self.mxs[1]
+            mot = torch.tensor(self.mot[idx], dtype=torch.float32) / self.mxs[2]
+
+        return torch.stack([eeg, emg, mot])
 
     def _getlb_idx(self, idx):
         lb = torch.zeros(self.window_size, dtype=torch.float32)
