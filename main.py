@@ -4,20 +4,21 @@ import torch
 # from src.eegpp.train import train
 
 if __name__ == '__main__':
-    import torch
-    t = torch.ones(3)
-    t = t/3
-    print(t)
+    # import torch
+    # t = torch.ones(3)
+    # t = t/3
+    # print(t)
+    # from src.eegpp.data.data_utils import LABEL_DICT
+    # print(len(LABEL_DICT))
     # train()
     # import yaml
     # config = yaml.safe_load(open('./src/eegpp/configs/cnn1d_config.yml'))
     # print(config['conv_layers'])
     # for layer in config['conv_layers']:
     #     print(layer['out_channels'])
-    # import joblib
-    # start_datetime, eeg, emg, mot, lbs, mxs = joblib.load('./src/eegpp/data/dump/dump_eeg_1.pkl')
-    # print(np.array(eeg).shape)
-    # print(np.array(start_datetime).shape, np.array(eeg).shape, np.array(emg).shape, np.array(mot).shape, np.array(lbs).shape, np.array(mxs).shape)
+    import joblib
+    start_datetime, eeg, emg, mot, lbs, mxs = joblib.load('./src/eegpp/data/dump/dump_eeg_1.pkl')
+    print(np.array(start_datetime).shape, np.array(eeg).shape, np.array(emg).shape, np.array(mot).shape, np.array(lbs).shape, np.array(mxs).shape)
     # print(phases[0])
     # t = []
     # for i in range(3):

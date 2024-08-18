@@ -5,6 +5,7 @@ import torch
 from torch.utils.data import Dataset
 
 from src.eegpp import params
+from src.eegpp.data.data_utils import LABEL_DICT
 
 
 class EEGDataset(Dataset):
@@ -31,42 +32,44 @@ class EEGDataset(Dataset):
         return len(self.start_datetime)
 
     def __getitem__(self, idx):
-        seqs = []
-        lbs = []
         if self.contain_side == 'none':
-            seqs.append(self._getseq_idx(idx))
-            lbs.append(self._getlb_idx(idx))
-            seqs = torch.stack(seqs)
+            return self._getseq_idx(idx), self._getlb_idx(idx)
         else:
+            seqs, lbs = [[], []]
             if self.contain_side == 'right':
-                for i in range(int(idx), int(idx + self.window_size) + 1):
+                for i in range(idx, idx + self.window_size):
                     seqs.append(self._getseq_idx(i))
                     lbs.append(self._getlb_idx(i))
             elif self.contain_side == 'left':
-                for i in range(int(idx - self.window_size), int(idx) + 1):
+                for i in range(idx - self.window_size + 1, idx + 1):
                     seqs.append(self._getseq_idx(i))
                     lbs.append(self._getlb_idx(i))
             elif self.contain_side == 'both':
-                for i in range(int(idx - self.window_size / 2), int(idx + self.window_size / 2) + 1):
+                pos_shift = int((self.window_size - 1) / 2)
+                for i in range(idx - pos_shift, idx + pos_shift + 1):
                     seqs.append(self._getseq_idx(i))
                     lbs.append(self._getlb_idx(i))
             seqs = torch.concat(seqs, dim=-1)
+            lbs = torch.stack(lbs)
         return seqs, lbs
 
     def _getseq_idx(self, idx):
-        if idx < 0 or idx >= self.__len__():
-            eeg = torch.zeros(self.segment_length, dtype=torch.float32)
-            emg = torch.zeros(self.segment_length, dtype=torch.float32)
-            mot = torch.zeros(self.segment_length, dtype=torch.float32)
-        else:
-            eeg = torch.tensor(self.eeg[idx], dtype=torch.float32) / self.mxs[0]
-            emg = torch.tensor(self.emg[idx], dtype=torch.float32) / self.mxs[1]
-            mot = torch.tensor(self.mot[idx], dtype=torch.float32) / self.mxs[2]
+        try:
+            if idx < 0 or idx >= self.__len__():
+                eeg = torch.zeros(self.segment_length, dtype=torch.float32)
+                emg = torch.zeros(self.segment_length, dtype=torch.float32)
+                mot = torch.zeros(self.segment_length, dtype=torch.float32)
+            else:
+                eeg = torch.tensor(self.eeg[idx], dtype=torch.float32) / self.mxs[0]
+                emg = torch.tensor(self.emg[idx], dtype=torch.float32) / self.mxs[1]
+                mot = torch.tensor(self.mot[idx], dtype=torch.float32) / self.mxs[2]
 
-        return torch.stack([eeg, emg, mot])
+            return torch.stack([eeg, emg, mot])
+        except IndexError:
+            print(idx, self.__len__())
 
     def _getlb_idx(self, idx):
-        lb = torch.zeros(self.window_size, dtype=torch.float32)
+        lb = torch.zeros(len(LABEL_DICT), dtype=torch.float32)
         if not self.is_infer:
             if idx < 0 or idx >= self.__len__():
                 lb_idx = -1

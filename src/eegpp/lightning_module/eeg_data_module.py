@@ -8,6 +8,7 @@ from src.eegpp.data import DUMP_DATA_FILES
 from src.eegpp.data.data_utils import dump_seq_with_labels
 from src.eegpp.data.data_utils import split_dataset
 from src.eegpp.data.eeg_dataset import EEGDataset
+from src.eegpp import params
 
 
 # from src.eegpp import params
@@ -47,7 +48,7 @@ class EEGDataModule(LightningDataModule):
             for idx in self.dataset_file_idx:
                 dump_file = DUMP_DATA_FILES['train'][idx]
                 print("Loading dump file {}".format(dump_file))
-                i_dataset = EEGDataset(dump_file)
+                i_dataset = EEGDataset(dump_file, window_size=params.W_OUT)
                 train_set, val_set, test_set = split_dataset(i_dataset)
                 train_dts.append(train_set)
                 val_dts.append(val_set)
@@ -56,7 +57,7 @@ class EEGDataModule(LightningDataModule):
         else:
             for dump_file in DUMP_DATA_FILES['train']:
                 print("Loading dump file {}".format(dump_file))
-                i_dataset = EEGDataset(dump_file)
+                i_dataset = EEGDataset(dump_file, window_size=params.W_OUT)
                 train_set, val_set, test_set = split_dataset(i_dataset)
                 train_dts.append(train_set)
                 val_dts.append(val_set)

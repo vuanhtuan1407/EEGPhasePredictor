@@ -1,6 +1,7 @@
 # import joblib
 
 import joblib
+import numpy as np
 import torch
 from torch.utils.data import random_split
 from tqdm import tqdm
@@ -66,8 +67,11 @@ def dump_seq_with_labels(seq_files=SEQ_FILES, lb_files=LABEL_FILES):
         all_start_ms, all_eeg, all_emg, all_mot, all_lbs, all_mxs = load_seq_with_labels(seq_files, lb_files)
         for i, (start_ms, eeg, emg, mot, lbs, mxs) in enumerate(
                 zip(all_start_ms, all_eeg, all_emg, all_mot, all_lbs, all_mxs)):
+
             print(f'Dumping data in file {DUMP_DATA_FILES["train"][i]}')
             start_datetime = [ut.convert_ms2datetime(ms) for ms in start_ms]
+            print(np.array(start_datetime).shape, np.array(eeg).shape, np.array(emg).shape, np.array(mot).shape,
+                  np.array(lbs).shape, np.array(mxs).shape)
             joblib.dump((start_datetime, eeg, emg, mot, lbs, mxs), DUMP_DATA_FILES['train'][i])
     except Exception as e:
         raise e
@@ -103,6 +107,7 @@ def load_seq_with_labels(seq_files=SEQ_FILES, lb_files=LABEL_FILES):
     all_eeg, all_emg, all_mot, all_mxs = [[], [], [], []]
     for i, seq_file in enumerate(seq_files):
         start_ms = all_start_ms[i]
+        lbs = all_lbs[i]
         eeg, emg, mot = [[], [], []]
         mxs = [-INF_V, -INF_V, -INF_V]
         tmp_idx = 0
@@ -146,6 +151,7 @@ def load_seq_with_labels(seq_files=SEQ_FILES, lb_files=LABEL_FILES):
         all_emg.append(emg)
         all_mot.append(mot)
         all_mxs.append(mxs)
+        all_lbs.append(lbs[: tmp_idx + 1])
 
     return all_start_ms, all_eeg, all_emg, all_mot, all_lbs, all_mxs
 

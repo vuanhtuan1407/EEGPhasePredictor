@@ -64,7 +64,7 @@ class CNN1DModel(nn.Module):
         super().__init__()
         self.config = ut.load_config_yaml(yml_config_file)
         conv_layer_config = self.config['conv_layers']
-        self.conv1d = nn.ModuleList()
+        self.conv1d = nn.Sequential()
         conv_in_channels = self.config['inp_embedding_dim']
         for i, layer_config in enumerate(conv_layer_config):
             conv_layer = Conv1DLayer(
@@ -83,7 +83,7 @@ class CNN1DModel(nn.Module):
 
         self.flatten = nn.Flatten()
 
-        ff_in_features = 1024
+        ff_in_features = 3834
         self.ff1 = nn.Sequential(
             nn.Linear(in_features=ff_in_features, out_features=ff_in_features * 2),
             nn.ReLU(),
@@ -92,7 +92,7 @@ class CNN1DModel(nn.Module):
             nn.Linear(in_features=ff_in_features * 2, out_features=len(LABEL_DICT) * params.W_OUT),
             nn.ReLU(),
         )
-        self.softmax = nn.Softmax(dim=1)
+        self.softmax = nn.Softmax(dim=-1)
 
     def forward(self, x):
         # x = mut.preprocess_inp(x, self.config['inp_embedding_dim'], self.config['turnoff'])
@@ -102,4 +102,4 @@ class CNN1DModel(nn.Module):
         x = self.ff2(x)
         x = x.reshape(-1, len(LABEL_DICT), params.W_OUT)
         x = x.transpose(1, 2)
-        return self.softmax(x, dim=-1)
+        return self.softmax(x)

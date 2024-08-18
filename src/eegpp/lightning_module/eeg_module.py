@@ -53,7 +53,6 @@ class EEGModule(LightningModule):
         x, y = batch
         pred = self.forward(x)
         loss = self.compute_loss(pred, y)
-        print(x.shape, '\n', y.shape, '\n', loss.shape)
         return x, y, pred, loss
 
     def training_step(self, batch, batch_idx):
