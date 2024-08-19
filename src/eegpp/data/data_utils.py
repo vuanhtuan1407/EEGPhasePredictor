@@ -138,6 +138,8 @@ def load_seq_with_labels(seq_files=SEQ_FILES, lb_files=LABEL_FILES):
                 emg.append(tmp_emg)
                 mot.append(tmp_mot)
                 tmp_idx += 1
+            else:
+                print("Sequence size less than default. Ignore this segment")
 
             all_start_ms[i] = start_ms[: tmp_idx]
             all_lbs[i] = lbs[: tmp_idx]
