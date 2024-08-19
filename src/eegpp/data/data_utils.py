@@ -25,43 +25,6 @@ def get_lb_idx(lb_text):
     return lb_idx
 
 
-# def dump_seq_with_labels(seq_files=SEQ_FILES, lb_files=LABEL_FILES, step_ms=4000):
-#     try:
-#         all_start_ms1, all_eeg, all_emg, all_mot = load_seq(seq_files, step_ms)
-#         all_start_ms2, all_lbs = load_lbs(lb_files)
-#
-#         # =========================================
-#         # Handle if all_start_ms1 != all_start_ms2
-#         all_start_ms = []
-#         for start_ms1, start_ms2 in zip(all_start_ms1, all_start_ms2):
-#             all_start_ms.append(start_ms1 if len(start_ms1) < len(start_ms2) else start_ms2)
-#
-#         # =========================================
-#
-#         # Assume that all_start_ms1 == all_start_ms2
-#         print('Dump data files...')
-#         for i, start_ms in enumerate(all_start_ms):
-#             eeg, emg, mot, lbs = all_eeg[i], all_emg[i], all_mot[i], all_lbs[i]
-#             start_datetime = [ut.convert_ms2datetime(ms) for ms in start_ms]
-#             joblib.dump((start_datetime, eeg, emg, mot, lbs), DUMP_DATA_FILES['train'][i])
-#
-#             # phases = []
-#             # for tmp_start_ms, tmp_eeg, tmp_emg, tmp_mot, tmp_lb in zip(start_ms, eeg, emg, mot, lbs):
-#             #     tmp_start_datetime = ut.convert_ms2datetime(tmp_start_ms)
-#             #     phase = {
-#             #         "start_ms": tmp_start_ms,
-#             #         "start_datetime": tmp_start_datetime,
-#             #         "eeg": tmp_eeg,
-#             #         "emg": tmp_emg,
-#             #         "mot": tmp_mot,
-#             #     }
-#             #     phases.append(phase)
-#             # joblib.dump(phases, DUMP_DATA_FILES['train'][i])
-#             print(f'Dump data in file {DUMP_DATA_FILES["train"][i]}')
-#     except Exception as e:
-#         raise e
-
-
 def dump_seq_with_labels(seq_files=SEQ_FILES, lb_files=LABEL_FILES):
     try:
         all_start_ms, all_eeg, all_emg, all_mot, all_lbs, all_mxs = load_seq_with_labels(seq_files, lb_files)
