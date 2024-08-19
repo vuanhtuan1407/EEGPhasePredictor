@@ -4,10 +4,6 @@ import torch
 # from src.eegpp.train import train
 
 if __name__ == '__main__':
-    # import torch
-    # t = torch.ones(3)
-    # t = t/3
-    # print(t)
     # from src.eegpp.data.data_utils import LABEL_DICT
     # print(len(LABEL_DICT))
     # train()
@@ -17,8 +13,10 @@ if __name__ == '__main__':
     # for layer in config['conv_layers']:
     #     print(layer['out_channels'])
     import joblib
-    start_datetime, eeg, emg, mot, lbs, mxs = joblib.load('./src/eegpp/data/dump/dump_eeg_3.pkl')
-    print(len(start_datetime), len(eeg), len(emg), len(mot), len(lbs), len(mxs))
+    value_seqs, label_seqs, mx, misc = joblib.load('./src/eegpp/data/dump_eeg_1.pkl')
+    print(len(value_seqs[1]), len(label_seqs), len(mx))
+    start_dt, eeg, emg, mot, lbs, mxs = joblib.load('./src/eegpp/data/dump/dump_eeg_1.pkl')
+    print(len(start_dt), len(eeg), len(emg), len(mot), len(lbs), len(mxs))
     # print(np.array(start_datetime).shape, np.array(eeg).shape, np.array(emg).shape, np.array(mot).shape, np.array(lbs).shape, np.array(mxs).shape)
     # print(phases[0])
     # t = []

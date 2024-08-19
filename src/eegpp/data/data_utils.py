@@ -1,11 +1,11 @@
 # import joblib
 
 import joblib
-import numpy as np
 import torch
 from torch.utils.data import random_split
 from tqdm import tqdm
 
+from src.eegpp import params
 from src.eegpp import utils as ut
 from src.eegpp.data import SEQ_FILES, LABEL_FILES, DUMP_DATA_FILES
 
@@ -116,9 +116,14 @@ def load_seq_with_labels(seq_files=SEQ_FILES, lb_files=LABEL_FILES):
 
                 ms = ut.convert_datetime2ms(dt)
                 if tmp_idx < len(start_ms) - 1 and ms == start_ms[tmp_idx + 1]:
-                    eeg.append(tmp_eeg)
-                    emg.append(tmp_emg)
-                    mot.append(tmp_mot)
+                    if len(tmp_eeg) >= params.MAX_SEQ_SIZE and len(tmp_emg) >= params.MAX_SEQ_SIZE and len(
+                            tmp_mot) == params.MAX_SEQ_SIZE:
+                        eeg.append(tmp_eeg[:params.MAX_SEQ_SIZE])
+                        emg.append(tmp_emg[:params.MAX_SEQ_SIZE])
+                        mot.append(tmp_mot[:params.MAX_SEQ_SIZE])
+                    else:
+                        print("Sequence size less than default. Ignore this segment")
+
                     tmp_idx += 1
                     tmp_eeg, tmp_emg, tmp_mot = [[], [], []]
 
@@ -126,18 +131,21 @@ def load_seq_with_labels(seq_files=SEQ_FILES, lb_files=LABEL_FILES):
                 tmp_emg.append(float(values[1]))
                 tmp_mot.append(float(values[2]))
 
-            eeg.append(tmp_eeg)
-            emg.append(tmp_emg)
-            mot.append(tmp_mot)
+            # update if num lbs > num segments and
+            if len(tmp_eeg) >= params.MAX_SEQ_SIZE and len(tmp_emg) >= params.MAX_SEQ_SIZE and len(
+                    tmp_mot) == params.MAX_SEQ_SIZE:
+                eeg.append(tmp_eeg)
+                emg.append(tmp_emg)
+                mot.append(tmp_mot)
+                tmp_idx += 1
 
-            # update if num lbs > num segments
-            all_start_ms[i] = start_ms[: tmp_idx + 1]
-            all_lbs[i] = lbs[: tmp_idx + 1]
+            all_start_ms[i] = start_ms[: tmp_idx]
+            all_lbs[i] = lbs[: tmp_idx]
 
-        all_eeg.append(eeg)
-        all_emg.append(emg)
-        all_mot.append(mot)
-        all_mxs.append(mxs)
+            all_eeg.append(eeg)
+            all_emg.append(emg)
+            all_mot.append(mot)
+            all_mxs.append(mxs)
 
     return all_start_ms, all_eeg, all_emg, all_mot, all_lbs, all_mxs
 

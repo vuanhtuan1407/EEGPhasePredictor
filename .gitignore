@@ -11,3 +11,4 @@ src/eegpp/data/train
 src/eegpp/data/val
 src/eegpp/data/test
 src/eegpp/data/dump
+src/eegpp/data/*.pkl
