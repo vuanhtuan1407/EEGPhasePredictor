@@ -2,8 +2,8 @@ import torch
 from lightning import LightningModule
 from torch.optim import AdamW, SGD
 from torchmetrics.classification import MulticlassF1Score
-from src.eegpp import params
 
+from src.eegpp import params
 from src.eegpp.data.data_utils import LABEL_DICT
 from src.eegpp.models.get_model import get_model
 
@@ -42,6 +42,8 @@ class EEGModule(LightningModule):
     def configure_optimizers(self):
         if self.hparams.optimizer_type == 'AdamW':
             optimizer = AdamW(self.model.parameters(), lr=self.hparams.lr)
+        elif self.hparams.optimizer_type == 'Adam':
+            optimizer = AdamW(self.model.parameters(), lr=self.hparams.lr)
         else:
             optimizer = SGD(self.model.parameters(), lr=self.hparams.lr)
         return optimizer
@@ -64,6 +66,9 @@ class EEGModule(LightningModule):
         x, y, pred, loss = self.base_step(batch, batch_idx)
         self.log('val_loss', loss)
         return loss
+
+    def on_validation_epoch_end(self) -> None:
+        pass
 
     def test_step(self, batch, batch_idx):
         x, lb, pred, loss = self.base_step(batch, batch_idx)
