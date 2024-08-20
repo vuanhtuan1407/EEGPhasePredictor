@@ -7,6 +7,7 @@ from lightning_module.eeg_data_module import EEGDataModule
 from lightning_module.eeg_module import EEGModule
 from src.eegpp import params
 from src.eegpp.callbacks.callback_utils import early_stopping, model_checkpoint
+from src.eegpp.data import DUMP_DATA_FILES
 
 
 def train(
@@ -21,7 +22,8 @@ def train(
         batch_size=params.BATCH_SIZE,
         num_workers=params.NUM_WORKERS,
         dataset_file_idx=params.DATASET_FILE_IDX,
-        lr=params.LEARNING_RATE
+        lr=params.LEARNING_RATE,
+        n_splits=params.N_SPLITS
 ):
     torch.set_float32_matmul_precision('medium')
 
@@ -52,28 +54,38 @@ def train(
     else:
         trainer_callbacks = [early_stopping]
 
-    eeg_module = EEGModule(
-        model_type=model_type,
-        lr=lr
-    )
     eeg_data_module = EEGDataModule(
         batch_size=batch_size,
         num_workers=num_workers,
-        dataset_file_idx=dataset_file_idx
+        dataset_file_idx=dataset_file_idx,
+        n_splits=n_splits
     )
 
-    trainer = L.Trainer(
-        devices=device,
-        accelerator=accelerator,
-        max_epochs=num_epochs,
-        logger=logger,
-        enable_checkpointing=enable_checkpointing,
-        val_check_interval=1.0,
-        reload_dataloaders_every_n_epochs=1,
-        callbacks=trainer_callbacks,
-    )
+    eeg_data_module.setup()
 
-    trainer.fit(eeg_module, datamodule=eeg_data_module, ckpt_path=checkpoint)
+    for k in range(n_splits):
+        print(f"Working on fold {k + 1} of {n_splits}")
+        eeg_data_module.setup_train_val_k(k)
+        train_dataloader, val_dataloader = eeg_data_module.train_dataloader(), eeg_data_module.val_dataloader()
+
+        eeg_module = EEGModule(
+            model_type=model_type,
+            lr=lr
+        )
+
+        trainer = L.Trainer(
+            devices=device,
+            accelerator=accelerator,
+            max_epochs=num_epochs,
+            logger=logger,
+            enable_checkpointing=enable_checkpointing,
+            val_check_interval=1.0,
+            reload_dataloaders_every_n_epochs=1,
+            callbacks=trainer_callbacks,
+        )
+
+        trainer.fit(eeg_module, train_dataloaders=train_dataloader, val_dataloaders=val_dataloader,
+                    ckpt_path=checkpoint)
 
     if logger:  # turn off wandb quiet if logger is not False
         wandb.finish(quiet=True)
