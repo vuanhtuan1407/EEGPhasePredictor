@@ -3,8 +3,8 @@ import torch
 import wandb
 from lightning.pytorch.loggers import WandbLogger
 
-from lightning_module.eeg_data_module import EEGDataModule
-from lightning_module.eeg_module import EEGModule
+from src.eegpp.lightning_module.eeg_data_module import EEGDataModule
+from src.eegpp.lightning_module.eeg_module import EEGModule
 from src.eegpp import params
 from src.eegpp.callbacks.callback_utils import early_stopping, model_checkpoint
 from src.eegpp.data import DUMP_DATA_FILES
