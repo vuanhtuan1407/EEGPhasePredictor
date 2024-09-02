@@ -19,7 +19,7 @@ class EEGDataModule(LightningDataModule):
     def __init__(
             self,
             batch_size=8,
-            num_workers=1,
+            num_workers=0,
             dataset_file_idx: Union[list[int], str] = 'all',
             n_splits=5
     ):
